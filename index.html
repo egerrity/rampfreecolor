@@ -1,569 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brand Color Palette Generator</title>
+    <title>Color Palette Calculator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
-            padding: 20px;
-            min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        body.dark-mode {
-            background: #1a202c;
-            color: #e2e8f0;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .header h1 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            transition: color 0.3s ease;
-        }
-        
-        .dark-mode .header h1 {
-            color: #f7fafc;
-        }
-        
-        .header p {
-            color: #718096;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.5;
-            transition: color 0.3s ease;
-        }
-        
-        .dark-mode .header p {
-            color: #a0aec0;
-        }
-        
-        .input-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-            text-align: center;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .dark-mode .input-section {
-            background: #2d3748;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .color-input-group {
-            display: inline-block;
-            position: relative;
-        }
-        
-        .color-input {
-            width: 80px;
-            height: 80px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            transition: transform 0.2s ease;
-        }
-        
-        .color-input:hover {
-            transform: scale(1.05);
-        }
-        
-        .hex-input {
-            margin-left: 20px;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: monospace;
-            width: 120px;
-            background: white;
-            color: #2d3748;
-            transition: all 0.3s ease;
-        }
-        
-        .dark-mode .hex-input {
-            background: #4a5568;
-            border-color: #718096;
-            color: #f7fafc;
-        }
-        
-        .dark-mode .hex-input:focus {
-            border-color: #63b3ed;
-        }
-        
-        .generate-btn {
-            margin-left: 20px;
-            padding: 12px 24px;
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-        
-        .generate-btn:hover {
-            background: #3182ce;
-        }
-        
-        .export-btn {
-            margin-left: 10px;
-            padding: 12px 24px;
-            background: #38a169;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-        
-        .export-btn:hover {
-            background: #2f855a;
-        }
-        
-        .export-btn:disabled {
-            background: #a0aec0;
-            cursor: not-allowed;
-        }
-        
-        .temperature-indicator {
-            margin-top: 15px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: inline-block;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .temperature-cool {
-            background: #bee3f8;
-            color: #2c5282;
-        }
-        
-        .temperature-warm {
-            background: #fed7cc;
-            color: #c53030;
-        }
-        
-        .palette-section {
-            display: none;
-        }
-        
-        .palette-section.visible {
-            display: block;
-        }
-        
-        .color-family {
-            background: white;
-            margin-bottom: 30px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .dark-mode .color-family {
-            background: #2d3748;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .family-header {
-            padding: 20px;
-            border-bottom: 1px solid #e2e8f0;
-            transition: border-color 0.3s ease;
-        }
-        
-        .dark-mode .family-header {
-            border-bottom-color: #4a5568;
-        }
-        
-        .family-header h3 {
-            color: #2d3748;
-            margin-bottom: 5px;
-            transition: color 0.3s ease;
-        }
-        
-        .dark-mode .family-header h3 {
-            color: #f7fafc;
-        }
-        
-        .family-header p {
-            color: #718096;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-        
-        .dark-mode .family-header p {
-            color: #a0aec0;
-        }
-        
-        .mode-selector {
-            display: flex;
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 20px;
-            transition: background-color 0.3s ease;
-        }
-        
-        .dark-mode .mode-selector {
-            background: #4a5568;
-        }
-        
-        .mode-button {
-            flex: 1;
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #64748b;
-        }
-        
-        .mode-button.active {
-            background: white;
-            color: #1e293b;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .dark-mode .mode-button {
-            color: #a0aec0;
-        }
-        
-        .dark-mode .mode-button.active {
-            background: #2d3748;
-            color: #f1f5f9;
-        }
-        
-        .color-groups {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-        }
-        
-        .color-group {
-            padding: 20px;
-        }
-        
-        .color-group:first-child {
-            border-right: 1px solid #e2e8f0;
-            transition: border-color 0.3s ease;
-        }
-        
-        .dark-mode .color-group:first-child {
-            border-right-color: #4a5568;
-        }
-        
-        .group-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #4a5568;
-            transition: color 0.3s ease;
-        }
-        
-        .dark-mode .group-title {
-            color: #cbd5e0;
-        }
-        
-        .color-ramp {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 10px;
-        }
-        
-        .color-swatch {
-            flex: 1;
-            height: 60px;
-            border-radius: 6px;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        .color-swatch:hover {
-            transform: translateY(-2px);
-        }
-        
-        .color-swatch .color-info {
-            position: absolute;
-            bottom: 4px;
-            left: 4px;
-            right: 4px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-size: 10px;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: monospace;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        
-        .color-swatch:hover .color-info {
-            opacity: 1;
-        }
-        
-        .usage-examples {
-            margin-top: 15px;
-            padding: 12px;
-            background: #f7fafc;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #718096;
-            transition: all 0.3s ease;
-        }
-        
-        .dark-mode .usage-examples {
-            background: #4a5568;
-            color: #a0aec0;
-        }
-        
-        .dark-mode-toggle {
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .color-groups {
-                grid-template-columns: 1fr;
-            }
-            
-            .color-group:first-child {
-                border-right: none;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            
-            .dark-mode .color-group:first-child {
-                border-bottom-color: #4a5568;
-            }
-            
-            .hex-input {
-                margin-left: 0;
-                margin-top: 15px;
-                display: block;
-            }
-            
-            .generate-btn {
-                margin-left: 0;
-                margin-top: 15px;
-                display: block;
-            }
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .input-row { margin-bottom: 20px; }
+        input[type="color"] { width: 60px; height: 60px; border: none; border-radius: 50%; margin-right: 15px; }
+        input[type="text"] { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; }
+        button { padding: 10px 20px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        button:hover { background: #005999; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .mode-tabs { margin: 20px 0; }
+        .mode-tabs button { background: #eee; color: #333; }
+        .mode-tabs button.active { background: #007acc; color: white; }
+        .preview { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+        .color-box { height: 40px; border-radius: 4px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); }
+        .family-title { font-weight: bold; margin: 20px 0 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f9f9f9; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Brand Color Palette Generator</h1>
-            <p>Enter your brand color to generate temperature-aware neutrals and signal colors organized for bright and deep use cases.</p>
+        <h1>Color Palette Calculator</h1>
+        
+        <div class="input-row">
+            <input type="color" id="colorPicker" value="#4299e1">
+            <input type="text" id="hexInput" value="#4299e1" placeholder="#4299e1">
+            <button onclick="generate()">Generate</button>
+            <button onclick="exportTable()" id="exportBtn" disabled>Export Table</button>
         </div>
         
-        <div class="input-section">
-            <div class="color-input-group">
-                <input type="color" id="brandColor" class="color-input" value="#4299e1">
-                <input type="text" id="hexInput" class="hex-input" value="#4299e1" placeholder="#4299e1">
-                <button onclick="generatePalette()" class="generate-btn">Generate Palette</button>
-                <button onclick="exportToExcel()" class="export-btn" id="exportBtn" disabled>Export to Excel</button>
-            </div>
-            <div id="temperatureIndicator" class="temperature-indicator"></div>
-            
-            <div class="mode-selector">
-                <button class="mode-button active" onclick="switchColorMode('light')">Light Mode Colors</button>
-                <button class="mode-button" onclick="switchColorMode('dark')">Dark Mode Colors</button>
-            </div>
+        <div class="mode-tabs">
+            <button class="active" onclick="switchMode('light')">Light Mode</button>
+            <button onclick="switchMode('dark')">Dark Mode</button>
         </div>
         
-        <div id="paletteSection" class="palette-section">
-            <div id="brandFamily" class="color-family">
-                <div class="family-header">
-                    <h3>Brand Color</h3>
-                    <p>Your primary brand color in bright and deep variations</p>
-                </div>
-                <div class="color-groups">
-                    <div class="color-group">
-                        <div class="group-title">Bright</div>
-                        <div id="brandBright" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Card backgrounds, subtle highlights, hover states</div>
-                    </div>
-                    <div class="color-group">
-                        <div class="group-title">Deep</div>
-                        <div id="brandDeep" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Primary buttons, active states, emphasis</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="neutralFamily" class="color-family">
-                <div class="family-header">
-                    <h3>Neutral Colors</h3>
-                    <p>Temperature-matched grays with a subtle hint of your brand color</p>
-                </div>
-                <div class="color-groups">
-                    <div class="color-group">
-                        <div class="group-title">Bright</div>
-                        <div id="neutralBright" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Text on light backgrounds, borders, dividers</div>
-                    </div>
-                    <div class="color-group">
-                        <div class="group-title">Deep</div>
-                        <div id="neutralDeep" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Dark text, secondary buttons, muted elements</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="greenFamily" class="color-family">
-                <div class="family-header">
-                    <h3>Success Green</h3>
-                    <p>Temperature-matched green for positive actions and feedback</p>
-                </div>
-                <div class="color-groups">
-                    <div class="color-group">
-                        <div class="group-title">Bright</div>
-                        <div id="greenBright" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Success messages, positive indicators</div>
-                    </div>
-                    <div class="color-group">
-                        <div class="group-title">Deep</div>
-                        <div id="greenDeep" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Success buttons, confirmation actions</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="yellowFamily" class="color-family">
-                <div class="family-header">
-                    <h3>Warning Yellow</h3>
-                    <p>Temperature-matched yellow for warnings and caution</p>
-                </div>
-                <div class="color-groups">
-                    <div class="color-group">
-                        <div class="group-title">Bright</div>
-                        <div id="yellowBright" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Warning banners, caution indicators</div>
-                    </div>
-                    <div class="color-group">
-                        <div class="group-title">Deep</div>
-                        <div id="yellowDeep" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Warning buttons, attention-grabbing elements</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="redFamily" class="color-family">
-                <div class="family-header">
-                    <h3>Error Red</h3>
-                    <p>Temperature-matched red for errors and destructive actions</p>
-                </div>
-                <div class="color-groups">
-                    <div class="color-group">
-                        <div class="group-title">Bright</div>
-                        <div id="redBright" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Error messages, validation feedback</div>
-                    </div>
-                    <div class="color-group">
-                        <div class="group-title">Deep</div>
-                        <div id="redDeep" class="color-ramp"></div>
-                        <div class="usage-examples">Use for: Delete buttons, destructive actions</div>
-                    </div>
-                </div>
-            </div>
+        <div id="preview"></div>
+        
+        <div id="exportSection" class="hidden">
+            <h3>Export Data (Copy & Paste into Figma):</h3>
+            <table id="exportTable">
+                <thead>
+                    <tr><th>Variable Name</th><th>Light Mode</th><th>Dark Mode</th></tr>
+                </thead>
+                <tbody id="exportBody"></tbody>
+            </table>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Keep track of current brand color and temperature
-        let currentBrandColor = '#4299e1';
-        let isWarmColor = false;
-        let currentColorMode = 'light'; // 'light' or 'dark'
-        let generatedPalettes = {}; // Store both light and dark mode palettes
+        let currentColor = '#4299e1';
+        let currentMode = 'light';
+        let palettes = { light: null, dark: null };
         
-        // Switch between showing light mode and dark mode colors
-        function switchColorMode(mode) {
-            currentColorMode = mode;
-            
-            // Update button states
-            document.querySelectorAll('.mode-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Toggle dark mode for the entire UI
-            if (mode === 'dark') {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-            
-            // Regenerate palette with new mode
-            generatePalette();
-        }
-        
-        // Connect the color picker and text input
-        const colorInput = document.getElementById('brandColor');
-        const hexInput = document.getElementById('hexInput');
-        
-        colorInput.addEventListener('input', function() {
-            hexInput.value = this.value;
-            currentBrandColor = this.value;
-            updateTemperatureIndicator();
+        document.getElementById('colorPicker').addEventListener('change', function() {
+            currentColor = this.value;
+            document.getElementById('hexInput').value = this.value;
         });
         
-        hexInput.addEventListener('input', function() {
-            if (isValidHex(this.value)) {
-                colorInput.value = this.value;
-                currentBrandColor = this.value;
-                updateTemperatureIndicator();
+        document.getElementById('hexInput').addEventListener('input', function() {
+            if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+                currentColor = this.value;
+                document.getElementById('colorPicker').value = this.value;
             }
         });
         
-        // Check if a hex color is valid
-        function isValidHex(hex) {
-            return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
-        }
-        
-        // Convert hex to RGB
         function hexToRgb(hex) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : null;
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
         }
         
-        // Convert RGB to HSL (simplified version for temperature detection)
         function rgbToHsl(r, g, b) {
             r /= 255; g /= 255; b /= 255;
-            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
             let h, s, l = (max + min) / 2;
             
             if (max === min) {
@@ -578,337 +94,176 @@
                 }
                 h /= 6;
             }
-            return {h: h * 360, s: s * 100, l: l * 100};
+            return { h: h * 360, s: s * 100, l: l * 100 };
         }
         
-        // Determine if color is warm or cool
-        function isColorWarm(hex) {
-            const rgb = hexToRgb(hex);
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            const hue = hsl.h;
-            
-            // Warm colors: 0-60° (reds, oranges) and 300-360° (magentas)
-            return (hue >= 0 && hue <= 60) || (hue >= 300 && hue <= 360);
-        }
-        
-        // Update temperature indicator
-        function updateTemperatureIndicator() {
-            const indicator = document.getElementById('temperatureIndicator');
-            isWarmColor = isColorWarm(currentBrandColor);
-            
-            if (isWarmColor) {
-                indicator.textContent = 'Warm Color Detected';
-                indicator.className = 'temperature-indicator temperature-warm';
-            } else {
-                indicator.textContent = 'Cool Color Detected';
-                indicator.className = 'temperature-indicator temperature-cool';
-            }
-        }
-        
-        // Generate a color ramp with 5 variations
-        function generateColorRamp(baseHex, rampType = 'bright', forDarkMode = false) {
-            const rgb = hexToRgb(baseHex);
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            const colors = [];
-            
-            if (rampType === 'bright') {
-                if (forDarkMode) {
-                    // Dark mode bright: optimized for dark backgrounds
-                    const lightnesses = [85, 75, 65, 50, 35];
-                    lightnesses.forEach(lightness => {
-                        colors.push(hslToHex(hsl.h, hsl.s, lightness));
-                    });
-                } else {
-                    // Light mode bright: contrast-driven
-                    // Start with very light colors
-                    const color1 = hslToHex(hsl.h, Math.min(hsl.s * 0.3, 15), 98); // Very light
-                    const color2 = hslToHex(hsl.h, Math.min(hsl.s * 0.5, 25), 95); // Light
-                    const color3 = hslToHex(hsl.h, Math.min(hsl.s * 0.7, 35), 88); // Medium light
-                    const color4 = hslToHex(hsl.h, Math.min(hsl.s * 0.85, 50), 78); // Medium
-                    
-                    // Find darkest color that has AA contrast (4.5:1) on color1 and color2
-                    const color5 = findColorWithContrast(color1, 4.5, false);
-                    
-                    colors.push(color1, color2, color3, color4, color5);
-                }
-            } else { // deep
-                if (forDarkMode) {
-                    // Dark mode deep: darker but not too dark
-                    const lightnesses = [60, 45, 35, 25, 15];
-                    lightnesses.forEach(lightness => {
-                        colors.push(hslToHex(hsl.h, hsl.s, lightness));
-                    });
-                } else {
-                    // Light mode deep: ensure lightest color is actually light
-                    const color5 = hslToHex(hsl.h, hsl.s, 8);  // Very dark
-                    const color4 = hslToHex(hsl.h, hsl.s, 18); // Dark
-                    const color3 = hslToHex(hsl.h, hsl.s, 35); // Vibrant middle (primary)
-                    const color2 = hslToHex(hsl.h, Math.min(hsl.s * 0.8, 60), 55); // Medium
-                    
-                    // Force the lightest color to actually be light with reduced saturation
-                    const color1 = hslToHex(hsl.h, Math.min(hsl.s * 0.4, 30), 92);
-                    
-                    colors.push(color1, color2, color3, color4, color5);
-                }
-            }
-            
-            return colors;
-        }
-        
-        // Calculate contrast ratio between two colors
-        function getContrastRatio(color1, color2) {
-            const lum1 = getLuminance(color1);
-            const lum2 = getLuminance(color2);
-            const brightest = Math.max(lum1, lum2);
-            const darkest = Math.min(lum1, lum2);
-            return (brightest + 0.05) / (darkest + 0.05);
-        }
-        
-        // Calculate relative luminance
-        function getLuminance(hex) {
-            const rgb = hexToRgb(hex);
-            const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(c => {
-                c = c / 255;
-                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-            });
-            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        }
-        
-        // Find a color with target contrast against a background
-        function findColorWithContrast(baseHex, targetContrast, lighter = true) {
-            const baseRgb = hexToRgb(baseHex);
-            const baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
-            
-            let testLightness = lighter ? 95 : 5;
-            let step = lighter ? -1 : 1;
-            let attempts = 0;
-            
-            while (attempts < 100) {
-                const testColor = hslToHex(baseHsl.h, baseHsl.s, testLightness);
-                const contrast = getContrastRatio(baseHex, testColor);
-                
-                if (contrast >= targetContrast) {
-                    return testColor;
-                }
-                
-                testLightness += step;
-                if (testLightness < 0) testLightness = 0;
-                if (testLightness > 100) testLightness = 100;
-                attempts++;
-            }
-            
-            // Fallback
-            return hslToHex(baseHsl.h, baseHsl.s, lighter ? 95 : 5);
-        }
         function hslToHex(h, s, l) {
-            h = h / 360;
-            s = s / 100;
-            l = l / 100;
-            
-            const hue2rgb = (p, q, t) => {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1/6) return p + (q - p) * 6 * t;
-                if (t < 1/2) return q;
-                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                return p;
-            };
-            
+            h /= 360; s /= 100; l /= 100;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+            const m = l - c / 2;
             let r, g, b;
-            if (s === 0) {
-                r = g = b = l;
+            
+            if (h < 1/6) { r = c; g = x; b = 0; }
+            else if (h < 2/6) { r = x; g = c; b = 0; }
+            else if (h < 3/6) { r = 0; g = c; b = x; }
+            else if (h < 4/6) { r = 0; g = x; b = c; }
+            else if (h < 5/6) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+            
+            r = Math.round((r + m) * 255);
+            g = Math.round((g + m) * 255);
+            b = Math.round((b + m) * 255);
+            
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+        
+        function isWarm(hex) {
+            const { r, g, b } = hexToRgb(hex);
+            const { h } = rgbToHsl(r, g, b);
+            return (h >= 0 && h <= 60) || (h >= 300 && h <= 360);
+        }
+        
+        function adjustSignalColor(baseHex, brandHex, type) {
+            const { r, g, b } = hexToRgb(baseHex);
+            const { h, s, l } = rgbToHsl(r, g, b);
+            const warm = isWarm(brandHex);
+            
+            let shift = 0;
+            if (type === 'yellow') shift = warm ? 5 : -8;
+            else if (type === 'green' || type === 'red') shift = warm ? 3 : -3;
+            else shift = warm ? 8 : -8;
+            
+            const newH = (h + shift + 360) % 360;
+            return hslToHex(newH, s, l);
+        }
+        
+        function generateRamp(baseHex, type, isDark) {
+            const { r, g, b } = hexToRgb(baseHex);
+            const { h, s, l } = rgbToHsl(r, g, b);
+            
+            if (isDark) {
+                const lightnesses = type === 'bright' ? [85, 75, 65, 50, 35] : [60, 45, 35, 25, 15];
+                return lightnesses.map(lightness => hslToHex(h, s, lightness));
+            }
+            
+            if (type === 'bright') {
+                return [
+                    hslToHex(h, Math.min(s * 0.3, 15), 98),
+                    hslToHex(h, Math.min(s * 0.5, 25), 95),
+                    hslToHex(h, Math.min(s * 0.7, 35), 88),
+                    hslToHex(h, Math.min(s * 0.85, 50), 78),
+                    hslToHex(h, s, 25)
+                ];
             } else {
-                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                const p = 2 * l - q;
-                r = hue2rgb(p, q, h + 1/3);
-                g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1/3);
+                return [
+                    hslToHex(h, Math.min(s * 0.4, 30), 92),
+                    hslToHex(h, Math.min(s * 0.8, 60), 55),
+                    hslToHex(h, s, 35),
+                    hslToHex(h, s, 18),
+                    hslToHex(h, s, 8)
+                ];
             }
-            
-            const toHex = (c) => {
-                const hex = Math.round(c * 255).toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            };
-            
-            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
         }
         
-        // Generate temperature-shifted signal colors
-        function generateSignalColor(baseSignalHex, brandHex, colorType = 'normal') {
-            const brandRgb = hexToRgb(brandHex);
-            const brandHsl = rgbToHsl(brandRgb.r, brandRgb.g, brandRgb.b);
-            
-            const signalRgb = hexToRgb(baseSignalHex);
-            const signalHsl = rgbToHsl(signalRgb.r, signalRgb.g, signalRgb.b);
-            
-            // Very subtle temperature shifts based on color type
-            let adjustedHue = signalHsl.h;
-            let hueShift = 0;
-            
-            if (colorType === 'yellow') {
-                hueShift = isWarmColor ? 5 : -8; // Keep yellow from becoming orange
-            } else if (colorType === 'green' || colorType === 'red') {
-                hueShift = isWarmColor ? 3 : -3; // Barely perceptible shift for green/red
-            } else {
-                hueShift = isWarmColor ? 8 : -8; // Default shift
-            }
-            
-            adjustedHue = (adjustedHue + hueShift + 360) % 360;
-            
-            return hslToHex(adjustedHue, signalHsl.s, signalHsl.l);
+        function generateNeutral(brandHex) {
+            const { r, g, b } = hexToRgb(brandHex);
+            const { h } = rgbToHsl(r, g, b);
+            return hslToHex(h, 8, 50);
         }
         
-        // Generate neutral colors with brand color influence
-        function generateNeutralColor(brandHex) {
-            const rgb = hexToRgb(brandHex);
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-            
-            // Create a neutral with very low saturation but same hue
-            return hslToHex(hsl.h, 8, 50); // Low saturation, medium lightness
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-tabs button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (palettes[mode]) showPreview(palettes[mode]);
         }
         
-        // Create color swatches in the DOM
-        function createColorSwatches(colors, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            const colorNames = ['Lightest', 'Light', 'Medium', 'Dark', 'Darkest'];
-            
-            colors.forEach((color, index) => {
-                const swatch = document.createElement('div');
-                swatch.className = 'color-swatch';
-                swatch.style.backgroundColor = color;
-                
-                const info = document.createElement('div');
-                info.className = 'color-info';
-                info.innerHTML = `${colorNames[index]}<br>${color}`;
-                swatch.appendChild(info);
-                
-                // Add click to copy functionality
-                swatch.addEventListener('click', () => {
-                    navigator.clipboard.writeText(color).then(() => {
-                        // Simple feedback - could be enhanced with a toast
-                        info.innerHTML = `Copied!<br>${color}`;
-                        setTimeout(() => {
-                            info.innerHTML = `${colorNames[index]}<br>${color}`;
-                        }, 1000);
-                    });
-                });
-                
-                container.appendChild(swatch);
-            });
-        }
-        
-        // Export palette to Excel format for Figma variables
-        function exportToExcel() {
-            if (!generatedPalettes.light || !generatedPalettes.dark) {
-                alert('Please generate both light and dark mode palettes first!');
-                return;
-            }
-            
-            // Create workbook and worksheet
-            const workbook = XLSX.utils.book_new();
-            const worksheetData = [];
-            
-            // Add header row
-            worksheetData.push(['Variable Name', 'Light Mode', 'Dark Mode']);
-            
-            // Color families and their types
-            const families = [
-                { name: 'Brand', key: 'brand' },
-                { name: 'Neutral', key: 'neutral' },
-                { name: 'Green', key: 'green' },
-                { name: 'Yellow', key: 'yellow' },
-                { name: 'Red', key: 'red' }
-            ];
-            
+        function showPreview(palette) {
+            const preview = document.getElementById('preview');
+            const families = ['Brand', 'Neutral', 'Green', 'Yellow', 'Red'];
             const types = ['Bright', 'Deep'];
             const names = ['Lightest', 'Light', 'Medium', 'Dark', 'Darkest'];
             
-            // Generate rows for each color
+            let html = '';
             families.forEach(family => {
                 types.forEach(type => {
-                    names.forEach((name, index) => {
-                        const variableName = `${family.name}/${type}/${name}`;
-                        const lightColor = generatedPalettes.light[`${family.key}${type}`]?.[index] || '';
-                        const darkColor = generatedPalettes.dark[`${family.key}${type}`]?.[index] || '';
-                        
-                        worksheetData.push([variableName, lightColor, darkColor]);
+                    html += '<div class="family-title">' + family + ' ' + type + '</div>';
+                    const colors = palette[family.toLowerCase() + type];
+                    colors.forEach((color, i) => {
+                        html += '<div class="color-box" style="background:' + color + '">' + names[i] + '<br>' + color + '</div>';
+                    });
+                });
+            });
+            preview.innerHTML = html;
+        }
+        
+        function generate() {
+            const brandColor = currentColor;
+            const neutral = generateNeutral(brandColor);
+            const green = adjustSignalColor('#10b981', brandColor, 'green');
+            const yellow = adjustSignalColor('#f59e0b', brandColor, 'yellow');
+            const red = adjustSignalColor('#ef4444', brandColor, 'red');
+            
+            const isDark = currentMode === 'dark';
+            
+            palettes[currentMode] = {
+                brandBright: generateRamp(brandColor, 'bright', isDark),
+                brandDeep: generateRamp(brandColor, 'deep', isDark),
+                neutralBright: generateRamp(neutral, 'bright', isDark),
+                neutralDeep: generateRamp(neutral, 'deep', isDark),
+                greenBright: generateRamp(green, 'bright', isDark),
+                greenDeep: generateRamp(green, 'deep', isDark),
+                yellowBright: generateRamp(yellow, 'bright', isDark),
+                yellowDeep: generateRamp(yellow, 'deep', isDark),
+                redBright: generateRamp(red, 'bright', isDark),
+                redDeep: generateRamp(red, 'deep', isDark)
+            };
+            
+            showPreview(palettes[currentMode]);
+            
+            if (palettes.light && palettes.dark) {
+                document.getElementById('exportBtn').disabled = false;
+            }
+        }
+        
+        function exportTable() {
+            if (!palettes.light || !palettes.dark) {
+                alert('Generate both light and dark mode palettes first!');
+                return;
+            }
+            
+            const families = ['Brand', 'Neutral', 'Green', 'Yellow', 'Red'];
+            const types = ['Bright', 'Deep'];
+            const names = ['Lightest', 'Light', 'Medium', 'Dark', 'Darkest'];
+            
+            let html = '';
+            families.forEach(family => {
+                types.forEach(type => {
+                    names.forEach((name, i) => {
+                        const key = family.toLowerCase() + type;
+                        const light = palettes.light[key][i];
+                        const dark = palettes.dark[key][i];
+                        html += '<tr><td>' + family + '/' + type + '/' + name + '</td><td>' + light + '</td><td>' + dark + '</td></tr>';
                     });
                 });
             });
             
-            // Create worksheet and add to workbook
-            const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+            document.getElementById('exportBody').innerHTML = html;
+            document.getElementById('exportSection').classList.remove('hidden');
             
-            // Set column widths
-            worksheet['!cols'] = [
-                { wch: 25 }, // Variable Name column
-                { wch: 12 }, // Light Mode column
-                { wch: 12 }  // Dark Mode column
-            ];
-            
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Color Variables');
-            
-            // Generate filename with brand color
-            const brandHex = currentBrandColor.replace('#', '');
-            const filename = `color-palette-${brandHex}.xlsx`;
-            
-            // Download the file
-            XLSX.writeFile(workbook, filename);
-        }
-        function generatePalette() {
-            const brandColor = currentBrandColor;
-            
-            // Base signal colors
-            const baseGreen = '#10b981';
-            const baseYellow = '#f59e0b';
-            const baseRed = '#ef4444';
-            
-            // Generate temperature-shifted signal colors
-            const adjustedGreen = generateSignalColor(baseGreen, brandColor, 'green');
-            const adjustedYellow = generateSignalColor(baseYellow, brandColor, 'yellow');
-            const adjustedRed = generateSignalColor(baseRed, brandColor, 'red');
-            const adjustedNeutral = generateNeutralColor(brandColor);
-            
-            // Determine if we're generating for dark mode
-            const forDarkMode = currentColorMode === 'dark';
-            
-            // Generate ramps for each color family
-            const brandBright = generateColorRamp(brandColor, 'bright', forDarkMode);
-            const brandDeep = generateColorRamp(brandColor, 'deep', forDarkMode);
-            
-            const neutralBright = generateColorRamp(adjustedNeutral, 'bright', forDarkMode);
-            const neutralDeep = generateColorRamp(adjustedNeutral, 'deep', forDarkMode);
-            
-            const greenBright = generateColorRamp(adjustedGreen, 'bright', forDarkMode);
-            const greenDeep = generateColorRamp(adjustedGreen, 'deep', forDarkMode);
-            
-            const yellowBright = generateColorRamp(adjustedYellow, 'bright', forDarkMode);
-            const yellowDeep = generateColorRamp(adjustedYellow, 'deep', forDarkMode);
-            
-            const redBright = generateColorRamp(adjustedRed, 'bright', forDarkMode);
-            const redDeep = generateColorRamp(adjustedRed, 'deep', forDarkMode);
-            
-            // Create swatches
-            createColorSwatches(brandBright, 'brandBright');
-            createColorSwatches(brandDeep, 'brandDeep');
-            createColorSwatches(neutralBright, 'neutralBright');
-            createColorSwatches(neutralDeep, 'neutralDeep');
-            createColorSwatches(greenBright, 'greenBright');
-            createColorSwatches(greenDeep, 'greenDeep');
-            createColorSwatches(yellowBright, 'yellowBright');
-            createColorSwatches(yellowDeep, 'yellowDeep');
-            createColorSwatches(redBright, 'redBright');
-            createColorSwatches(redDeep, 'redDeep');
-            
-            // Show the palette section
-            document.getElementById('paletteSection').classList.add('visible');
+            // Auto-select the table for easy copying
+            setTimeout(function() {
+                const table = document.getElementById('exportTable');
+                const range = document.createRange();
+                range.selectNode(table);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+            }, 100);
         }
         
-        // Initialize with default color
-        updateTemperatureIndicator();
-        generatePalette();
+        // Initialize
+        generate();
     </script>
 </body>
 </html>
