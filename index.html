@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Color Palette Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #718096;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .input-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .color-input-group {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .color-input {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        
+        .color-input:hover {
+            transform: scale(1.05);
+        }
+        
+        .hex-input {
+            margin-left: 20px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: monospace;
+            width: 120px;
+        }
+        
+        .generate-btn {
+            margin-left: 20px;
+            padding: 12px 24px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .generate-btn:hover {
+            background: #3182ce;
+        }
+        
+        .temperature-indicator {
+            margin-top: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .temperature-cool {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        
+        .temperature-warm {
+            background: #fed7cc;
+            color: #c53030;
+        }
+        
+        .palette-section {
+            display: none;
+        }
+        
+        .palette-section.visible {
+            display: block;
+        }
+        
+        .color-family {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .family-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .family-header h3 {
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .family-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .color-groups {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        
+        .color-group {
+            padding: 20px;
+        }
+        
+        .color-group:first-child {
+            border-right: 1px solid #e2e8f0;
+        }
+        
+        .group-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+        
+        .color-ramp {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .color-swatch {
+            flex: 1;
+            height: 60px;
+            border-radius: 6px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: translateY(-2px);
+        }
+        
+        .color-swatch .color-info {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .color-swatch:hover .color-info {
+            opacity: 1;
+        }
+        
+        .usage-examples {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #718096;
+        }
+        
+        @media (max-width: 768px) {
+            .color-groups {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-group:first-child {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            
+            .hex-input {
+                margin-left: 0;
+                margin-top: 15px;
+                display: block;
+            }
+            
+            .generate-btn {
+                margin-left: 0;
+                margin-top: 15px;
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Brand Color Palette Generator</h1>
+            <p>Enter your brand color to generate temperature-aware neutrals and signal colors organized for bright and deep use cases.</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="color-input-group">
+                <input type="color" id="brandColor" class="color-input" value="#4299e1">
+                <input type="text" id="hexInput" class="hex-input" value="#4299e1" placeholder="#4299e1">
+                <button onclick="generatePalette()" class="generate-btn">Generate Palette</button>
+            </div>
+            <div id="temperatureIndicator" class="temperature-indicator"></div>
+        </div>
+        
+        <div id="paletteSection" class="palette-section">
+            <div id="brandFamily" class="color-family">
+                <div class="family-header">
+                    <h3>Brand Color</h3>
+                    <p>Your primary brand color in bright and deep variations</p>
+                </div>
+                <div class="color-groups">
+                    <div class="color-group">
+                        <div class="group-title">Bright</div>
+                        <div id="brandBright" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Card backgrounds, subtle highlights, hover states</div>
+                    </div>
+                    <div class="color-group">
+                        <div class="group-title">Deep</div>
+                        <div id="brandDeep" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Primary buttons, active states, emphasis</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="neutralFamily" class="color-family">
+                <div class="family-header">
+                    <h3>Neutral Colors</h3>
+                    <p>Temperature-matched grays with a subtle hint of your brand color</p>
+                </div>
+                <div class="color-groups">
+                    <div class="color-group">
+                        <div class="group-title">Bright</div>
+                        <div id="neutralBright" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Text on light backgrounds, borders, dividers</div>
+                    </div>
+                    <div class="color-group">
+                        <div class="group-title">Deep</div>
+                        <div id="neutralDeep" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Dark text, secondary buttons, muted elements</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="greenFamily" class="color-family">
+                <div class="family-header">
+                    <h3>Success Green</h3>
+                    <p>Temperature-matched green for positive actions and feedback</p>
+                </div>
+                <div class="color-groups">
+                    <div class="color-group">
+                        <div class="group-title">Bright</div>
+                        <div id="greenBright" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Success messages, positive indicators</div>
+                    </div>
+                    <div class="color-group">
+                        <div class="group-title">Deep</div>
+                        <div id="greenDeep" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Success buttons, confirmation actions</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="yellowFamily" class="color-family">
+                <div class="family-header">
+                    <h3>Warning Yellow</h3>
+                    <p>Temperature-matched yellow for warnings and caution</p>
+                </div>
+                <div class="color-groups">
+                    <div class="color-group">
+                        <div class="group-title">Bright</div>
+                        <div id="yellowBright" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Warning banners, caution indicators</div>
+                    </div>
+                    <div class="color-group">
+                        <div class="group-title">Deep</div>
+                        <div id="yellowDeep" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Warning buttons, attention-grabbing elements</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="redFamily" class="color-family">
+                <div class="family-header">
+                    <h3>Error Red</h3>
+                    <p>Temperature-matched red for errors and destructive actions</p>
+                </div>
+                <div class="color-groups">
+                    <div class="color-group">
+                        <div class="group-title">Bright</div>
+                        <div id="redBright" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Error messages, validation feedback</div>
+                    </div>
+                    <div class="color-group">
+                        <div class="group-title">Deep</div>
+                        <div id="redDeep" class="color-ramp"></div>
+                        <div class="usage-examples">Use for: Delete buttons, destructive actions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Keep track of current brand color and temperature
+        let currentBrandColor = '#4299e1';
+        let isWarmColor = false;
+        
+        // Connect the color picker and text input
+        const colorInput = document.getElementById('brandColor');
+        const hexInput = document.getElementById('hexInput');
+        
+        colorInput.addEventListener('input', function() {
+            hexInput.value = this.value;
+            currentBrandColor = this.value;
+            updateTemperatureIndicator();
+        });
+        
+        hexInput.addEventListener('input', function() {
+            if (isValidHex(this.value)) {
+                colorInput.value = this.value;
+                currentBrandColor = this.value;
+                updateTemperatureIndicator();
+            }
+        });
+        
+        // Check if a hex color is valid
+        function isValidHex(hex) {
+            return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+        }
+        
+        // Convert hex to RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        
+        // Convert RGB to HSL (simplified version for temperature detection)
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return {h: h * 360, s: s * 100, l: l * 100};
+        }
+        
+        // Determine if color is warm or cool
+        function isColorWarm(hex) {
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            const hue = hsl.h;
+            
+            // Warm colors: 0-60° (reds, oranges) and 300-360° (magentas)
+            return (hue >= 0 && hue <= 60) || (hue >= 300 && hue <= 360);
+        }
+        
+        // Update temperature indicator
+        function updateTemperatureIndicator() {
+            const indicator = document.getElementById('temperatureIndicator');
+            isWarmColor = isColorWarm(currentBrandColor);
+            
+            if (isWarmColor) {
+                indicator.textContent = 'Warm Color Detected';
+                indicator.className = 'temperature-indicator temperature-warm';
+            } else {
+                indicator.textContent = 'Cool Color Detected';
+                indicator.className = 'temperature-indicator temperature-cool';
+            }
+        }
+        
+        // Generate a color ramp with 5 variations
+        function generateColorRamp(baseHex, isBright = true) {
+            const rgb = hexToRgb(baseHex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            const colors = [];
+            
+            if (isBright) {
+                // Bright ramp: lighter colors for dark content
+                const lightnesses = [95, 85, 75, 65, 55];
+                lightnesses.forEach(lightness => {
+                    colors.push(hslToHex(hsl.h, hsl.s, lightness));
+                });
+            } else {
+                // Deep ramp: darker colors for light content
+                const lightnesses = [45, 35, 25, 15, 5];
+                lightnesses.forEach(lightness => {
+                    colors.push(hslToHex(hsl.h, hsl.s, lightness));
+                });
+            }
+            
+            return colors;
+        }
+        
+        // Convert HSL back to hex
+        function hslToHex(h, s, l) {
+            h = h / 360;
+            s = s / 100;
+            l = l / 100;
+            
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            
+            const toHex = (c) => {
+                const hex = Math.round(c * 255).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+            
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+        
+        // Generate temperature-shifted signal colors
+        function generateSignalColor(baseSignalHex, brandHex) {
+            const brandRgb = hexToRgb(brandHex);
+            const brandHsl = rgbToHsl(brandRgb.r, brandRgb.g, brandRgb.b);
+            
+            const signalRgb = hexToRgb(baseSignalHex);
+            const signalHsl = rgbToHsl(signalRgb.r, signalRgb.g, signalRgb.b);
+            
+            // Shift the signal color's hue towards the brand color's temperature
+            let adjustedHue = signalHsl.h;
+            const hueShift = isWarmColor ? 15 : -15; // Shift towards warm or cool
+            adjustedHue = (adjustedHue + hueShift + 360) % 360;
+            
+            return hslToHex(adjustedHue, signalHsl.s, signalHsl.l);
+        }
+        
+        // Generate neutral colors with brand color influence
+        function generateNeutralColor(brandHex) {
+            const rgb = hexToRgb(brandHex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            
+            // Create a neutral with very low saturation but same hue
+            return hslToHex(hsl.h, 8, 50); // Low saturation, medium lightness
+        }
+        
+        // Create color swatches in the DOM
+        function createColorSwatches(colors, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            colors.forEach((color, index) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                
+                const info = document.createElement('div');
+                info.className = 'color-info';
+                info.textContent = color;
+                swatch.appendChild(info);
+                
+                // Add click to copy functionality
+                swatch.addEventListener('click', () => {
+                    navigator.clipboard.writeText(color).then(() => {
+                        // Simple feedback - could be enhanced with a toast
+                        info.textContent = 'Copied!';
+                        setTimeout(() => {
+                            info.textContent = color;
+                        }, 1000);
+                    });
+                });
+                
+                container.appendChild(swatch);
+            });
+        }
+        
+        // Main palette generation function
+        function generatePalette() {
+            const brandColor = currentBrandColor;
+            
+            // Base signal colors
+            const baseGreen = '#10b981';
+            const baseYellow = '#f59e0b';
+            const baseRed = '#ef4444';
+            
+            // Generate temperature-shifted signal colors
+            const adjustedGreen = generateSignalColor(baseGreen, brandColor);
+            const adjustedYellow = generateSignalColor(baseYellow, brandColor);
+            const adjustedRed = generateSignalColor(baseRed, brandColor);
+            const adjustedNeutral = generateNeutralColor(brandColor);
+            
+            // Generate ramps for each color family
+            const brandBright = generateColorRamp(brandColor, true);
+            const brandDeep = generateColorRamp(brandColor, false);
+            
+            const neutralBright = generateColorRamp(adjustedNeutral, true);
+            const neutralDeep = generateColorRamp(adjustedNeutral, false);
+            
+            const greenBright = generateColorRamp(adjustedGreen, true);
+            const greenDeep = generateColorRamp(adjustedGreen, false);
+            
+            const yellowBright = generateColorRamp(adjustedYellow, true);
+            const yellowDeep = generateColorRamp(adjustedYellow, false);
+            
+            const redBright = generateColorRamp(adjustedRed, true);
+            const redDeep = generateColorRamp(adjustedRed, false);
+            
+            // Create swatches
+            createColorSwatches(brandBright, 'brandBright');
+            createColorSwatches(brandDeep, 'brandDeep');
+            createColorSwatches(neutralBright, 'neutralBright');
+            createColorSwatches(neutralDeep, 'neutralDeep');
+            createColorSwatches(greenBright, 'greenBright');
+            createColorSwatches(greenDeep, 'greenDeep');
+            createColorSwatches(yellowBright, 'yellowBright');
+            createColorSwatches(yellowDeep, 'yellowDeep');
+            createColorSwatches(redBright, 'redBright');
+            createColorSwatches(redDeep, 'redDeep');
+            
+            // Show the palette section
+            document.getElementById('paletteSection').classList.add('visible');
+        }
+        
+        // Initialize with default color
+        updateTemperatureIndicator();
+        generatePalette();
+    </script>
+</body>
+</html>
